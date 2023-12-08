@@ -8,7 +8,7 @@ public class Order
     // DDD Patterns comment
     // Using private fields, allowed since EF Core 1.1, is a much better encapsulation
     // aligned with DDD Aggregates and Domain Entities (Instead of properties and property collections)
-    private DateTime _orderDate;
+    public DateTime OrderDate { get; }
 
     // Address is a Value Object pattern example persisted as EF Core 2.0 owned entity
     [Required]
@@ -57,7 +57,7 @@ public class Order
         BuyerId = buyerId;
         _paymentMethodId = paymentMethodId;
         _orderStatusId = OrderStatus.Submitted.Id;
-        _orderDate = DateTime.UtcNow;
+        OrderDate = DateTime.UtcNow;
         Address = address;
 
         // Add the OrderStarterDomainEvent to the domain events collection 
@@ -199,7 +199,7 @@ public class Order
     
     public DateTime GetOrderDate()
     {
-        return _orderDate;
+        return OrderDate;
     }
     
     public string GetDescription()

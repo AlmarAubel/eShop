@@ -23,11 +23,11 @@ class OrderItemEntityTypeConfiguration
             .HasColumnName("ProductName");
 
         orderItemConfiguration
-            .Property("_unitPrice")
+            .Property(o=>o.UnitPrice)
             .HasColumnName("UnitPrice");
 
         orderItemConfiguration
-            .Property("_units")
+            .Property(o=>o.Units)
             .HasColumnName("Units");
 
         orderItemConfiguration

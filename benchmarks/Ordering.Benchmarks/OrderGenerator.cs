@@ -54,7 +54,7 @@ public static class Fakers
                     paymentMethodId: f.PickRandom( buyer.PaymentMethods.Select(x=>x.Id).ToList())
                 );
 
-                int itemsCount = f.Random.Int(1, 5);
+                int itemsCount = f.Random.Int(20, 20);
                 for (int i = 0; i < itemsCount; i++)
                 {
                     order.AddOrderItem(

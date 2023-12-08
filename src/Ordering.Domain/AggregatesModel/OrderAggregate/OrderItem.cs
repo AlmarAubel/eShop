@@ -11,9 +11,9 @@ public class OrderItem
     [Required]
     private string _productName;
     private string _pictureUrl;
-    private decimal _unitPrice;
+    public decimal UnitPrice { get; }
     private decimal _discount;
-    private int _units;
+    public int Units { get; private set; }
 
     public int ProductId { get; private set; }
 
@@ -34,9 +34,9 @@ public class OrderItem
         ProductId = productId;
 
         _productName = productName;
-        _unitPrice = unitPrice;
+        UnitPrice = unitPrice;
         _discount = discount;
-        _units = units;
+        Units = units;
         _pictureUrl = PictureUrl;
     }
 
@@ -49,12 +49,12 @@ public class OrderItem
 
     public int GetUnits()
     {
-        return _units;
+        return Units;
     }
 
     public decimal GetUnitPrice()
     {
-        return _unitPrice;
+        return UnitPrice;
     }
 
     public string GetOrderItemProductName() => _productName;
@@ -76,6 +76,6 @@ public class OrderItem
             throw new OrderingDomainException("Invalid units");
         }
 
-        _units += units;
+        Units += units;
     }
 }

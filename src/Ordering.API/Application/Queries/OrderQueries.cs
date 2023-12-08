@@ -49,12 +49,12 @@ public class OrderQueries(OrderingContext context)
             .Select(ob => new OrderSummary
             {
                 ordernumber = ob.order.Id,
-                date = ob.order.GetOrderDate(),
+                date = ob.order.OrderDate,
                 status = ob.order.OrderStatus.Name,
-                total = (double)ob.order.GetTotal()
+                total =(double) ob.order.OrderItems.Sum(oi => oi.UnitPrice* oi.Units)
             })
             .ToListAsync();
-    }
+    }      
 
     public async Task<IEnumerable<CardType>> GetCardTypesAsync() => 
         await context.CardTypes.Select(c=> new CardType { Id = c.Id, Name = c.Name }).ToListAsync();

@@ -20,7 +20,7 @@ class OrderEntityTypeConfiguration : IEntityTypeConfiguration<Order>
             .HasColumnName("BuyerId");
 
         orderConfiguration
-            .Property("_orderDate")
+            .Property(o=> o.OrderDate)
             .HasColumnName("OrderDate");
 
         orderConfiguration

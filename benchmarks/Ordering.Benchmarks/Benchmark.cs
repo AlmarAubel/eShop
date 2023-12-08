@@ -8,20 +8,23 @@ using eShop.Ordering.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Ordering.Benchmarks.Database;
+using CardType = eShop.Ordering.API.Application.Queries.CardType;
 
 namespace Ordering.Benchmarks;
+[MinIterationCount(1)]
+[MaxIterationCount(10)]
+[WarmupCount(3)]
 
-[MaxIterationCount(20)]
 [MemoryDiagnoser(false)]
 public class Benchmark 
 {
     private DbConnection _connection = default!;
     private OrderRawSqlQueries _orderRawSqlQueries = default!;
     private OrderQueries _orderQueries = default!;
-    private List<eShop.Ordering.Domain.AggregatesModel.OrderAggregate.Order> _orders = default!;
-    private OrderingContext _orderingContext;
-    private List<Buyer> _buyers;
-    private string _buyerId;
+    private OrderingContext _orderingContext = default!;
+
+    private string _buyerId = default!;
+    //private int _orderId = 500;
 
     [GlobalSetup]
     public async Task GlobalSetup()
@@ -31,69 +34,58 @@ public class Benchmark
 
         var optionsBuilder = new DbContextOptionsBuilder<OrderingContext>();
         optionsBuilder.UseNpgsql(_connection);
-        optionsBuilder.EnableSensitiveDataLogging();
 
         _orderingContext = new OrderingContext(optionsBuilder.Options);
         _orderRawSqlQueries = new OrderRawSqlQueries(NpgsqlDataSource.Create(dbConnectionFactory.ConnectionString));
-        _orderQueries = new OrderQueries(_orderingContext);
+        
+        var seeder = new Seeder(_orderingContext);
+        _buyerId = await seeder.Seed();
         await _orderingContext.Database.EnsureCreatedAsync();
-        await Seed(_orderingContext);
-
+        
         _orderingContext.ChangeTracker.Clear();
     }
     
-    [IterationSetup]
-    public void IterationSetup() => _orderingContext.ChangeTracker.Clear();
+    // [Benchmark]
+    // public async Task<Order> RawSql_GetOrderAsync()
+    // {
+    //     return await _orderRawSqlQueries.GetOrderAsync(_orderId);
+    // }
+    //
+    // [Benchmark]
+    // public async Task<Order> EfCore_GetOrderAsync()
+    // {
+    //     return await _orderQueries.GetOrderAsync(_orderId);
+    // }
     
     [Benchmark]
-    [ArgumentsSource(nameof(OrderIds))]
-    public async Task<Order> RawSql_GetOrderAsync(int orderId)
+    public async Task<List<OrderSummary>> RawSql_GetOrdersAsync()
     {
-        return await _orderRawSqlQueries.GetOrderAsync(orderId);
-    }
-
-    [Benchmark]
-    [ArgumentsSource(nameof(OrderIds))]
-    public async Task<Order> EfCore_GetOrderAsync(int orderId)
-    {
-        return await _orderQueries.GetOrderAsync(orderId);
-    }
-    
-    [Benchmark]
-    public async Task<IEnumerable<OrderSummary>> RawSql_GetOrdersAsync()
-    {
-        return await _orderRawSqlQueries.GetOrdersFromUserAsync(_buyerId);
+        var result =  await _orderRawSqlQueries.GetOrdersFromUserAsync(_buyerId);
+        return result.ToList();
     }
     
     [Benchmark]
-    public async Task<IEnumerable<OrderSummary>> EfCore_GetOrdersAsync()
+    public async Task<List<OrderSummary>> EfCore_GetOrdersAsync()
     {
-        return await _orderQueries.GetOrdersFromUserAsync(_buyerId);
+        var result = await _orderQueries.GetOrdersFromUserAsync(_buyerId);
+        return result.ToList();
     }
     
-    public IEnumerable<object> OrderIds()
-    {
-        // yield return 1;
-        // yield return 50;
-        // yield return 100;
-        // yield return 250;
-        yield return 500;
-        // yield return 750;
-        // yield return 1000;
-    }
+    //
+    // [Benchmark]
+    // public async Task<List<CardType>> RawSql_GetCardTypesAsync()
+    // {  
+    //     var result = await _orderRawSqlQueries.GetCardTypesAsync();
+    //     return result.ToList();
+    // }   
+    //
+    // [Benchmark]
+    // public async Task<List<CardType>> EfCore_GetCardTypesAsync()
+    // {  
+    //     var result = await _orderQueries.GetCardTypesAsync();
+    //     return result.ToList();
+    // }
     
-    private async Task Seed(OrderingContext orderingContext1)
-    {
-        var orderingContextSeed = new OrderingContextSeed();
-
-        await orderingContextSeed.SeedAsync(orderingContext1);
-        var orderGenerator = new OrderGenerator(orderingContext1, new Random(42));
-        _buyers = await orderGenerator.GenerateBuyers(100);
-        _orders = await orderGenerator.GenerateOrders(1000,_buyers);
-        _buyerId = _buyers.Skip(50).First().IdentityGuid;
-    }
-    
-
     [GlobalCleanup]
     public void GlobalCleanup()
     {
