@@ -1,11 +1,15 @@
 ﻿namespace eShop.Ordering.API.Application.Queries;
 
-public class OrderQueries(IOrderRepository orderRepository, OrderingContext context)
+public class OrderQueries(OrderingContext context)
     : IOrderQueries
 {
     public async Task<Order> GetOrderAsync(int id)
     {
-        var order = await orderRepository.GetAsync(id);
+        var order = await context.Orders
+            .Include(o => o.OrderItems)
+            .Include(o => o.OrderStatus)
+            .FirstOrDefaultAsync(o => o.Id == id);
+      
         if (order is null)
             throw new KeyNotFoundException();
 

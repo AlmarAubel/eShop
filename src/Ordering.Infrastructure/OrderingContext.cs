@@ -29,7 +29,6 @@ public class OrderingContext : DbContext, IUnitOfWork
     {
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
 
-
         System.Diagnostics.Debug.WriteLine("OrderingContext::ctor ->" + this.GetHashCode());
     }
 
