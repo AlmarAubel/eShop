@@ -33,14 +33,11 @@ public class OrderQueries(OrderingContext context)
                 pictureurl = oi.GetPictureUri()
             }).ToList()
         };
-
     }
 
     public async Task<IEnumerable<OrderSummary>> GetOrdersFromUserAsync(string userId)
     {
         return await context.Orders
-            .Include(o => o.OrderItems)
-            .Include(o => o.OrderStatus)
             .Join(context.Buyers,
                 o => o.BuyerId,  
                 b => b.Id,       
@@ -53,6 +50,7 @@ public class OrderQueries(OrderingContext context)
                 status = ob.order.OrderStatus.Name,
                 total =(double) ob.order.OrderItems.Sum(oi => oi.UnitPrice* oi.Units)
             })
+            .AsSplitQuery()
             .ToListAsync();
     }      
 

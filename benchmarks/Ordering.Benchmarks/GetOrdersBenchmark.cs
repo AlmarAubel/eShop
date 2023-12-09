@@ -30,19 +30,9 @@ public class GetOrdersBenchmark
         var dbConnectionFactory = new DbConnectionFactory();
         _connection = await dbConnectionFactory.CreateConnectionAsync();
 
-        var optionsBuilder = new DbContextOptionsBuilder<OrderingContext>();
-        optionsBuilder.UseNpgsql(_connection);
+       
         
-        var loggerFactory = LoggerFactory.Create(builder => 
-        {
-            builder
-                .AddFilter((category, level) =>
-                    category == DbLoggerCategory.Database.Command.Name
-                    && level == LogLevel.Information)
-                .AddConsole();
-        });
-        
-        _orderingContext = new OrderingContext(optionsBuilder.Options);
+        _orderingContext = DbContextFactory.CreateDbContext(_connection);
         _orderRawSqlQueries = new OrderRawSqlQueries(NpgsqlDataSource.Create(dbConnectionFactory.ConnectionString));
         await _orderingContext.Database.EnsureCreatedAsync();
 
@@ -50,10 +40,8 @@ public class GetOrdersBenchmark
         _buyerId = await seeder.Seed();
 
         _orderingContext.ChangeTracker.Clear();
-        # if DEBUG
-        optionsBuilder.UseLoggerFactory(loggerFactory);
-        #endif
-        _orderingContext = new OrderingContext(optionsBuilder.Options);
+       
+        _orderingContext = DbContextFactory.CreateDbContextWithLogger(_connection);
     }
 
     [Benchmark(Baseline = true)]

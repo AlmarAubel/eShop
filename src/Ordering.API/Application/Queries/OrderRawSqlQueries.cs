@@ -65,7 +65,7 @@ public class OrderRawSqlQueries(NpgsqlDataSource dataSource)
             orderitems = new List<Orderitem>(),
             total = 0
         };
-
+        
         foreach (dynamic item in result)
         {
             var orderitem = new Orderitem

@@ -8,9 +8,11 @@ public class OrderItem
     // DDD Patterns comment
     // Using private fields, allowed since EF Core 1.1, is a much better encapsulation
     // aligned with DDD Aggregates and Domain Entities (Instead of properties and property collections)
-    [Required]
-    private string _productName;
-    private string _pictureUrl;
+
+    [field: Required] 
+    public string ProductName { get; }
+
+    public string PictureUrl { get; }
     public decimal UnitPrice { get; }
     private decimal _discount;
     public int Units { get; private set; }
@@ -33,14 +35,14 @@ public class OrderItem
 
         ProductId = productId;
 
-        _productName = productName;
+        ProductName = productName;
         UnitPrice = unitPrice;
         _discount = discount;
         Units = units;
-        _pictureUrl = PictureUrl;
+        this.PictureUrl = PictureUrl;
     }
 
-    public string GetPictureUri() => _pictureUrl;
+    public string GetPictureUri() => PictureUrl;
 
     public decimal GetCurrentDiscount()
     {
@@ -57,7 +59,7 @@ public class OrderItem
         return UnitPrice;
     }
 
-    public string GetOrderItemProductName() => _productName;
+    public string GetOrderItemProductName() => ProductName;
 
     public void SetNewDiscount(decimal discount)
     {

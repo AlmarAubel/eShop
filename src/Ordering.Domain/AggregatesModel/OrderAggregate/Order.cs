@@ -20,7 +20,7 @@ public class Order
     public OrderStatus OrderStatus { get; private set; }
     private int _orderStatusId;
 
-    private string _description;
+    public string Description { get; private set; }
 
     // Draft orders have this set to true. Currently we don't check anywhere the draft status of an Order, but we could do it if needed
 #pragma warning disable CS0414 // The field 'Order._isDraft' is assigned but its value is never used
@@ -72,7 +72,8 @@ public class Order
     // in order to maintain consistency between the whole Aggregate. 
     public void AddOrderItem(int productId, string productName, decimal unitPrice, decimal discount, string pictureUrl, int units = 1)
     {
-        var existingOrderForProduct = _orderItems.Where(o => o.ProductId == productId)
+        var existingOrderForProduct = _orderItems
+            .Where(o => o.ProductId == productId)
             .SingleOrDefault();
 
         if (existingOrderForProduct != null)
@@ -121,7 +122,7 @@ public class Order
             AddDomainEvent(new OrderStatusChangedToStockConfirmedDomainEvent(Id));
 
             _orderStatusId = OrderStatus.StockConfirmed.Id;
-            _description = "All the items were confirmed with available stock.";
+            Description = "All the items were confirmed with available stock.";
         }
     }
 
@@ -132,7 +133,7 @@ public class Order
             AddDomainEvent(new OrderStatusChangedToPaidDomainEvent(Id, OrderItems));
 
             _orderStatusId = OrderStatus.Paid.Id;
-            _description = "The payment was performed at a simulated \"American Bank checking bank account ending on XX35071\"";
+            Description = "The payment was performed at a simulated \"American Bank checking bank account ending on XX35071\"";
         }
     }
 
@@ -144,7 +145,7 @@ public class Order
         }
 
         _orderStatusId = OrderStatus.Shipped.Id;
-        _description = "The order was shipped.";
+        Description = "The order was shipped.";
         AddDomainEvent(new OrderShippedDomainEvent(this));
     }
 
@@ -157,7 +158,7 @@ public class Order
         }
 
         _orderStatusId = OrderStatus.Cancelled.Id;
-        _description = $"The order was cancelled.";
+        Description = $"The order was cancelled.";
         AddDomainEvent(new OrderCancelledDomainEvent(this));
     }
 
@@ -172,7 +173,7 @@ public class Order
                 .Select(c => c.GetOrderItemProductName());
 
             var itemsStockRejectedDescription = string.Join(", ", itemsStockRejectedProductNames);
-            _description = $"The product items don't have stock: ({itemsStockRejectedDescription}).";
+            Description = $"The product items don't have stock: ({itemsStockRejectedDescription}).";
         }
     }
 
@@ -204,6 +205,6 @@ public class Order
     
     public string GetDescription()
     {
-        return _description;
+        return Description;
     }
 }

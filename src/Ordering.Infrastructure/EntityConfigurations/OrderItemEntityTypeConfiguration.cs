@@ -19,19 +19,19 @@ class OrderItemEntityTypeConfiguration
             .HasColumnName("Discount");
 
         orderItemConfiguration
-            .Property("_productName")
+            .Property(o => o.ProductName)
             .HasColumnName("ProductName");
 
         orderItemConfiguration
-            .Property(o=>o.UnitPrice)
+            .Property(o => o.UnitPrice)
             .HasColumnName("UnitPrice");
 
         orderItemConfiguration
-            .Property(o=>o.Units)
+            .Property(o => o.Units)
             .HasColumnName("Units");
 
         orderItemConfiguration
-            .Property("_pictureUrl")
+            .Property(o => o.PictureUrl)
             .HasColumnName("PictureUrl");
     }
 }
