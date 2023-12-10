@@ -1,5 +1,4 @@
-﻿using System.Data;
-using Bogus;
+﻿using Bogus;
 using eShop.Ordering.Domain.AggregatesModel.BuyerAggregate;
 using eShop.Ordering.Domain.AggregatesModel.OrderAggregate;
 using eShop.Ordering.Infrastructure;
@@ -69,6 +68,7 @@ public static class Fakers
 
                 return order;
             });
+    
     public static Faker<Buyer> BuyerFaker=>
         new Faker<Buyer>()
             .CustomInstantiator(f =>

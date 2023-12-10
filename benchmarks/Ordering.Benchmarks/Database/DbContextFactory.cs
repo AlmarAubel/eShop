@@ -13,7 +13,7 @@ public static class DbContextFactory
 
         var loggerFactory = GetLoggerFactory();
 # if DEBUG
-        optionsBuilder.UseLoggerFactory(loggerFactory);
+        //optionsBuilder.UseLoggerFactory(loggerFactory);
 #endif
         return new OrderingContext(optionsBuilder.Options);
     }
